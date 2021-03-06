@@ -1,9 +1,22 @@
 # mastrobot_example.py
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+STATE = None
+
+BIRTH_YEAR = 1
+BIRTH_MONTH = 2
+BIRTH_DAY = 3
+
 # function to handle the /start command
 def start(update, context):
-    update.message.reply_text('start command received')
+    first_name = update.message.chat.first_name
+    update.message.reply_text(f"Hi {first_name}, nice to meet you!")
+    start_getting_birthday_info(update, context)
+
+def start_getting_birthday_info(update, context):
+    global STATE
+    STATE = BIRTH_YEAR
+    update.message.reply_text(f"I would need to know your birthday, so tell me what year did you born in...")
 
 # function to handle the /help command
 def help(update, context):
@@ -15,8 +28,17 @@ def error(update, context):
 
 # function to handle normal text
 def text(update, context):
-    text_received = update.message.text
-    update.message.reply_text(f'did you said "{text_received}" ?')
+    global STATE
+
+    if STATE == BIRTH_YEAR:
+        return received_birth_year(update, context)
+
+    if STATE == BIRTH_MONTH:
+        return received_birth_month(update, context)
+
+    if STATE == BIRTH_DAY:
+        return received_birth_day(update, context)
+
 
 def main():
     TOKEN = "1651091717:AAGIb112p3wgd-ai2tZ4nO1t0QLp4nVRo6M"
